@@ -71,7 +71,7 @@
 </span></code></pre>
 </div>
 
-<p>Under the hood, the <code class="highlighter-rouge">go test</code> tool will the code inside of the benchmark loop until a certain time limit is reached, at which point it is simple to derive performance characteristics from the number of iterations that finished and the resource consumption of your application during that time.</p>
+<p>Under the hood, the <code class="highlighter-rouge">go test</code> tool will the execute code inside of the benchmark loop until a certain time limit is reached, at which point it is simple to derive performance characteristics from the number of iterations that finished and the resource consumption of your application during that time.</p>
 
 <p>In order to get the absolute tightest bound on your application’s true performance, you should design your benchmark so that you have only the code you wish to measure inside the benchmark “<code class="highlighter-rouge">for</code>” loop. By doing any setup outside of the benchmark loop and then calling <a href="https://golang.org/pkg/testing/#B.ResetTimer"><code class="highlighter-rouge">b.ResetTimer</code></a> you will ensure that no allocations or cycles spent during setup will pollute your results.</p>
 
