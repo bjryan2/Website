@@ -3,6 +3,10 @@
     object-fit: contain;
 }
 
+::selection {
+    background: yellow;
+}
+
 pre {
   white-space: pre-wrap;
   font-family: $source-code-pro;
