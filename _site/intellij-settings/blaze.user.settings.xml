@@ -1,8 +1,0 @@
-<application>
-  <component name="BlazeUserSettings">
-    <option name="bazelBinaryPath" value="/usr/local/bin/bazel" />
-    <option name="resyncAutomatically" value="true" />
-    <option name="showPerformanceWarnings" value="true" />
-    <option name="syncStatusPopupShown" value="true" />
-  </component>
-</application>
