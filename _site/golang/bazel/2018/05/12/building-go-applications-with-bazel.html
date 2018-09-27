@@ -12,8 +12,8 @@
   <meta name="author" content="Brendan Ryan">
 
   
-    <meta name="description" content="Brendan Ryan - Software Engineer">
-    <meta name="og:description" content="Brendan Ryan - Software Engineer">
+    <meta name="description" content="Brendan Ryan">
+    <meta name="og:description" content="Brendan Ryan">
   
 
   
@@ -27,7 +27,7 @@
   <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
 
 </head>
-<body class="w-100 helvetica">
+<body class="w-100 helvetica bg-warm-white">
   <article class="content ma5-ns ma3 mb7">
     <article class="w-100 w-70-l" style="margin: 0 auto">
   <section class="text">
@@ -66,7 +66,7 @@
 
 <p>The first step to setting up a <code class="highlighter-rouge">bazel</code> repo is creating what is known as a <code class="highlighter-rouge">WORKSPACE</code> file. This file contains a manifest of all of you external dependencies and <code class="highlighter-rouge">bazel</code> libraries. Our project will build the <code class="highlighter-rouge">groupcache</code> binary and then package it into a Docker container for other developers to use. As such, our <code class="highlighter-rouge">WORKSPACE</code> file will look something like this:</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># download go bazel tools</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># download go bazel tools</span>
 <span class="n">http_archive</span><span class="p">(</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s">"io_bazel_rules_go"</span><span class="p">,</span>
     <span class="n">url</span> <span class="o">=</span> <span class="s">"https://github.com/bazelbuild/rules_go/releases/download/0.11.0/rules_go-0.11.0.tar.gz"</span><span class="p">,</span>
@@ -102,8 +102,7 @@
     <span class="n">importpath</span> <span class="o">=</span> <span class="s">"github.com/golang/protobuf"</span><span class="p">,</span>
     <span class="n">tag</span> <span class="o">=</span> <span class="s">"v1.0.0"</span><span class="p">,</span>
 <span class="p">)</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>The syntax of this file should be very familiar with those who have written <code class="highlighter-rouge">python</code> before - the <code class="highlighter-rouge">skylark</code> language is essentially a pared down version of the <code class="highlighter-rouge">python</code> language.</p>
 
@@ -115,21 +114,19 @@
 
 <p>To use <code class="highlighter-rouge">gazelle</code> and generate <code class="highlighter-rouge">BUILD</code> files for your project you must first create <code class="highlighter-rouge">BUILD.bazel</code> file in the root of your repo and configure the <code class="highlighter-rouge">gazelle</code> tool.</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">load</span><span class="p">(</span><span class="s">"@bazel_gazelle//:def.bzl"</span><span class="p">,</span> <span class="s">"gazelle"</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">load</span><span class="p">(</span><span class="s">"@bazel_gazelle//:def.bzl"</span><span class="p">,</span> <span class="s">"gazelle"</span><span class="p">)</span>
 
 <span class="n">gazelle</span><span class="p">(</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s">"gazelle"</span><span class="p">,</span>
     <span class="c"># you project name here!</span>
     <span class="n">prefix</span> <span class="o">=</span> <span class="s">"github.com/brendanjryan/groupcache-bazel"</span><span class="p">,</span>
 <span class="p">)</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>After this brief setup, invoking <code class="highlighter-rouge">gazelle</code> is simple straightforward - just <code class="highlighter-rouge">"run"</code> the job via <code class="highlighter-rouge">bazel</code>.</p>
 
-<div class="language-bash code-bg-yellow highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bazel run //:gazelle
-</code></pre>
-</div>
+<div class="language-bash code-bg-yellow highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>bazel run //:gazelle
+</code></pre></div></div>
 
 <p>That’s it! You should now see <code class="highlighter-rouge">BUILD</code> files in each package of your project. Take a few minutes to check these out and bask in the power of <code class="highlighter-rouge">gazelle</code>.</p>
 
@@ -137,42 +134,39 @@
 
 <p>Now that we have set up our <code class="highlighter-rouge">BUILD</code> files, the process of building our application is extremely straightforward. By running commands of the form <code class="highlighter-rouge">bazel build &lt;target&gt;</code>, you can build any package or target declared in your project.</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>bazel build //lru/...
-INFO: Analysed 2 targets <span class="o">(</span>3 packages loaded<span class="o">)</span>.
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bazel build //lru/...
+INFO: Analysed 2 targets <span class="o">(</span>3 packages loaded<span class="o">)</span><span class="nb">.</span>
 INFO: Found 2 targets...
 INFO: Elapsed <span class="nb">time</span>: 0.628s, Critical Path: 0.04s
 INFO: Build completed successfully, 1 total action
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p><strong>N.B. In <code class="highlighter-rouge">bazel</code>’s vernacular <code class="highlighter-rouge">//</code> denotes the “root” of your project and <code class="highlighter-rouge">...</code> denotes all “child” packages of the specified package. For example, the command <code class="highlighter-rouge">bazel build //lr/...</code> will build the <code class="highlighter-rouge">lru</code> package and all sub-packages underneath it.</strong></p>
 
 <p>Note that subsequent builds of the same target should be significantly faster:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>bazel build //lru/...
-INFO: Analysed 2 targets <span class="o">(</span>0 packages loaded<span class="o">)</span>.
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bazel build //lru/...
+INFO: Analysed 2 targets <span class="o">(</span>0 packages loaded<span class="o">)</span><span class="nb">.</span>
 INFO: Found 2 targets...
 INFO: Elapsed <span class="nb">time</span>: 0.268s, Critical Path: 0.01s
 INFO: Build completed successfully, 1 total action
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>If you want to build the <em>entire</em> project, you can run the following command - note the <em>significant</em> speedups gained from using <code class="highlighter-rouge">bazel</code>.</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>bazel build //...
-INFO: Analysed 19 targets <span class="o">(</span>64 packages loaded<span class="o">)</span>.
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bazel build //...
+INFO: Analysed 19 targets <span class="o">(</span>64 packages loaded<span class="o">)</span><span class="nb">.</span>
 INFO: Found 19 targets...
 INFO: Elapsed <span class="nb">time</span>: 8.206s, Critical Path: 3.24s
 INFO: Build completed successfully, 35 total actions
 
 bazel build //...
 zsh: correct <span class="s1">'//...'</span> to <span class="s1">'//..'</span> <span class="o">[</span>nyae]? n
-INFO: Analysed 19 targets <span class="o">(</span>0 packages loaded<span class="o">)</span>.
+INFO: Analysed 19 targets <span class="o">(</span>0 packages loaded<span class="o">)</span><span class="nb">.</span>
 INFO: Found 19 targets...
 INFO: Elapsed <span class="nb">time</span>: 0.382s, Critical Path: 0.00s
 INFO: Build completed successfully, 1 total action
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="testing-your-applications">Testing your applications</h2>
 
@@ -180,57 +174,53 @@ INFO: Build completed successfully, 1 total action
 
 <p>For example, to test the <code class="highlighter-rouge">consistenthash</code> package you would run:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>bazel <span class="nb">test</span> //consistenthash/...
-INFO: Analysed 2 targets <span class="o">(</span>0 packages loaded<span class="o">)</span>.
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bazel <span class="nb">test</span> //consistenthash/...
+INFO: Analysed 2 targets <span class="o">(</span>0 packages loaded<span class="o">)</span><span class="nb">.</span>
 INFO: Found 1 target and 1 <span class="nb">test </span>target...
 INFO: Elapsed <span class="nb">time</span>: 0.502s, Critical Path: 0.15s
 INFO: Build completed successfully, 2 total actions
 
 Executed 1 out of 1 <span class="nb">test</span>: 1 <span class="nb">test </span>passes.
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>And to test the entire project:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>bazel <span class="nb">test</span> //...
-INFO: Analysed 19 targets <span class="o">(</span>0 packages loaded<span class="o">)</span>.
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bazel <span class="nb">test</span> //...
+INFO: Analysed 19 targets <span class="o">(</span>0 packages loaded<span class="o">)</span><span class="nb">.</span>
 INFO: Found 15 targets and 4 <span class="nb">test </span>targets...
 INFO: Elapsed <span class="nb">time</span>: 1.733s, Critical Path: 0.91s
 INFO: Build completed successfully, 4 total actions
 
 Executed 4 out of 4 tests: 4 tests pass.
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Note that we get the same benefits of cached results as we do with <code class="highlighter-rouge">bazel build</code></p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>bazel <span class="nb">test</span> //...
-INFO: Analysed 19 targets <span class="o">(</span>0 packages loaded<span class="o">)</span>.
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bazel <span class="nb">test</span> //...
+INFO: Analysed 19 targets <span class="o">(</span>0 packages loaded<span class="o">)</span><span class="nb">.</span>
 INFO: Found 15 targets and 4 <span class="nb">test </span>targets...
 INFO: Elapsed <span class="nb">time</span>: 0.381s, Critical Path: 0.00s
 INFO: Build completed successfully, 1 total action
 
 Executed 0 out of 4 tests: 4 tests pass.
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>The <code class="highlighter-rouge">bazel</code> testrunner also provides additional functionality on top of <code class="highlighter-rouge">go test</code> - for instance you can pass the <code class="highlighter-rouge">--runs-per-test</code> flag to run your suite multiple times in parallel – very useful for catching flaky tests and data races between test runs.</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>bazel <span class="nb">test</span> --runs_per_test<span class="o">=</span>10 //...
-INFO: Analysed 19 targets <span class="o">(</span>0 packages loaded<span class="o">)</span>.
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bazel <span class="nb">test</span> <span class="nt">--runs_per_test</span><span class="o">=</span>10 //...
+INFO: Analysed 19 targets <span class="o">(</span>0 packages loaded<span class="o">)</span><span class="nb">.</span>
 INFO: Found 15 targets and 4 <span class="nb">test </span>targets...
 INFO: Elapsed <span class="nb">time</span>: 7.456s, Critical Path: 1.10s
 INFO: Build completed successfully, 41 total actions
 
 Executed 4 out of 4 tests: 4 tests pass.
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="packaging-your-application">Packaging your application</h2>
 
 <p>Now that we’ve gotten our project building with <code class="highlighter-rouge">bazel</code> - publishing the final binary as a <code class="highlighter-rouge">docker</code> container is surprisingly little work. To do so, we just declare each of the layers of the final image and then how and where the image will be published, like so:</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># load bazel rules for docker images</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># load bazel rules for docker images</span>
 <span class="n">load</span><span class="p">(</span><span class="s">"@io_bazel_rules_docker//go:image.bzl"</span><span class="p">,</span> <span class="s">"go_image"</span><span class="p">)</span>
 <span class="n">load</span><span class="p">(</span><span class="s">"@io_bazel_rules_docker//container:container.bzl"</span><span class="p">,</span> <span class="s">"container_push"</span><span class="p">,</span> <span class="s">"container_image"</span><span class="p">)</span>
 
@@ -257,16 +247,14 @@ Executed 4 out of 4 tests: 4 tests pass.
     <span class="n">repository</span> <span class="o">=</span> <span class="s">"brendanjryan/groupcache-bazel"</span><span class="p">,</span>
     <span class="n">tag</span> <span class="o">=</span> <span class="s">"master"</span><span class="p">,</span>  <span class="c"># don't use this on production image :)</span>
 <span class="p">)</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>One of the strengths of this process over the standard docker workflow is that no <code class="highlighter-rouge">Dockerfiles</code> are required and you can easily build and publish multiple images to multiple repositories - all in parallel!</p>
 
 <p>In our case, pushing our image up to <code class="highlighter-rouge">Dockerhub</code> is as simple as:</p>
 
-<div class="language-bash code-bg-yellow highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bazel run //example:push
-</code></pre>
-</div>
+<div class="language-bash code-bg-yellow highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>bazel run //example:push
+</code></pre></div></div>
 
 <p><em>Caveat: I do not recommend pushing images from your local workstation. This step should be part of your CI workflow</em>.</p>
 

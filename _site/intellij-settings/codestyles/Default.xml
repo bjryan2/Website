@@ -1,8 +1,0 @@
-<code_scheme name="Default" version="173">
-  <option name="SOFT_MARGINS" value="80,120" />
-  <codeStyleSettings language="go">
-    <indentOptions>
-      <option name="SMART_TABS" value="true" />
-    </indentOptions>
-  </codeStyleSettings>
-</code_scheme>

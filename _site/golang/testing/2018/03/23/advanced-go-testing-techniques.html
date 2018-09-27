@@ -12,8 +12,8 @@
   <meta name="author" content="Brendan Ryan">
 
   
-    <meta name="description" content="Brendan Ryan - Software Engineer">
-    <meta name="og:description" content="Brendan Ryan - Software Engineer">
+    <meta name="description" content="Brendan Ryan">
+    <meta name="og:description" content="Brendan Ryan">
   
 
   
@@ -27,7 +27,7 @@
   <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
 
 </head>
-<body class="w-100 helvetica">
+<body class="w-100 helvetica bg-warm-white">
   <article class="content ma5-ns ma3 mb7">
     <article class="w-100 w-70-l" style="margin: 0 auto">
   <section class="text">
@@ -50,7 +50,7 @@
 
 <p>An example of this technique is as follows:</p>
 
-<div class="language-golang highlighter-rouge"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">TestfmtStatStr</span><span class="p">(</span><span class="n">t</span><span class="x"> </span><span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">T</span><span class="p">){</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">TestfmtStatStr</span><span class="p">(</span><span class="n">t</span><span class="x"> </span><span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">T</span><span class="p">){</span><span class="x">
 	</span><span class="n">tests</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="p">[]</span><span class="k">struct</span><span class="p">{</span><span class="x">
 		</span><span class="n">msg</span><span class="x"> </span><span class="kt">string</span><span class="x">
 		</span><span class="n">stat</span><span class="x"> </span><span class="kt">string</span><span class="x">
@@ -91,8 +91,7 @@
 		</span><span class="p">})</span><span class="x">
 	</span><span class="p">}</span><span class="x">
 </span><span class="p">}</span><span class="x">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h2 id="external-test-packages">External Test Packages</h2>
 
@@ -101,14 +100,13 @@
 <p>By creating a separate <code class="highlighter-rouge">_test</code> package which sits alongside a package, you are able to separate your tests for private functionality from those for public methods and interfaces. Although this pattern is a little more work upfront and adds additional complexity to your project’s layout - it will ultimately result in friendlier more testable APIs.</p>
 
 <p>In practice, your file structure will look something like this:</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>- src
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- src
     - client 
         - client.go
         - client_test.go
     - client_test &lt;-- test package for public interfaces in 'client'
         - client_test.go
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="time-multipliers">Time Multipliers</h2>
 
@@ -118,7 +116,7 @@
 
 <p>The pattern is particularly useful when testing the <code class="highlighter-rouge">time.Ticker</code> object - as illustrated below:</p>
 
-<div class="language-golang highlighter-rouge"><pre class="highlight"><code><span class="k">var</span><span class="x"> </span><span class="p">(</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">var</span><span class="x"> </span><span class="p">(</span><span class="x">
 	</span><span class="n">timeMultiplier</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="m">1.0</span><span class="x">
 	</span><span class="n">batchMaxAge</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="x">
 	</span><span class="n">batchSize</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="m">25</span><span class="x">
@@ -144,8 +142,7 @@
 		</span><span class="n">batch</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="no">nil</span><span class="x">
 	</span><span class="p">}</span><span class="x">
 </span><span class="p">}</span><span class="x">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h2 id="embedding-types">Embedding Types</h2>
 
@@ -153,7 +150,7 @@
 
 <p>A common use case for this pattern is “setting up” and “tearing down” datastore resources like thus:</p>
 
-<div class="language-golang highlighter-rouge"><pre class="highlight"><code><span class="c">// User represents a user in our application.</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// User represents a user in our application.</span><span class="x">
 </span><span class="k">type</span><span class="x"> </span><span class="n">User</span><span class="x"> </span><span class="k">struct</span><span class="x"> </span><span class="p">{</span><span class="x">
 	</span><span class="n">Id</span><span class="x"> </span><span class="kt">int64</span><span class="x">
 	</span><span class="n">FirstName</span><span class="x"> </span><span class="kt">string</span><span class="x">
@@ -209,8 +206,7 @@
 </span><span class="k">func</span><span class="x"> </span><span class="p">(</span><span class="n">u</span><span class="x"> </span><span class="o">*</span><span class="n">UserManagerCreator</span><span class="p">)</span><span class="x"> </span><span class="n">Teardown</span><span class="p">()</span><span class="x"> </span><span class="kt">error</span><span class="x"> </span><span class="p">{</span><span class="x">
 	</span><span class="k">return</span><span class="x"> </span><span class="no">nil</span><span class="x">
 </span><span class="p">}</span><span class="x">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h2 id="further-readings">Further Readings</h2>
 

@@ -12,8 +12,8 @@
   <meta name="author" content="Brendan Ryan">
 
   
-    <meta name="description" content="Brendan Ryan - Software Engineer">
-    <meta name="og:description" content="Brendan Ryan - Software Engineer">
+    <meta name="description" content="Brendan Ryan">
+    <meta name="og:description" content="Brendan Ryan">
   
 
   
@@ -27,7 +27,7 @@
   <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
 
 </head>
-<body class="w-100 helvetica">
+<body class="w-100 helvetica bg-warm-white">
   <article class="content ma5-ns ma3 mb7">
     <article class="w-100 w-70-l" style="margin: 0 auto">
   <section class="text">
@@ -46,7 +46,7 @@
 
 <p>For our exercise we will be tuning the performance of a <a href="https://github.com/etsy/statsd"><code class="highlighter-rouge">statsd</code></a> client that our hypothetical web server relies on. Our server calls out to this client multiple times when serving each request, making it a very “hot” region of code. By using <a href="https://golang.org/pkg/runtime/pprof/"><code class="highlighter-rouge">pprof</code></a>, we have identified that we are spending a <strong>lot</strong> of CPU time in one function - a small utility for adding tags to a stat string as per the <a href="https://docs.datadoghq.com/developers/dogstatsd/">DogStatsD</a> spec.</p>
 
-<div class="language-golang highlighter-rouge"><pre class="highlight"><code><span class="c">// fmtStatString takes a preformatted statting string and appends</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// fmtStatString takes a preformatted statting string and appends</span><span class="x">
 </span><span class="c">// a flattened map of tags to it.</span><span class="x">
 </span><span class="k">func</span><span class="x"> </span><span class="n">fmtStatStr</span><span class="p">(</span><span class="n">stat</span><span class="x"> </span><span class="kt">string</span><span class="p">,</span><span class="x"> </span><span class="n">tags</span><span class="x"> </span><span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="kt">string</span><span class="x"> </span><span class="p">{</span><span class="x">
   </span><span class="n">parts</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="nb">make</span><span class="p">([]</span><span class="kt">string</span><span class="p">,</span><span class="x"> </span><span class="m">0</span><span class="p">,</span><span class="x"> </span><span class="nb">len</span><span class="p">(</span><span class="n">tags</span><span class="p">))</span><span class="x">
@@ -58,8 +58,7 @@
 
   </span><span class="k">return</span><span class="x"> </span><span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"%s|%s"</span><span class="p">,</span><span class="x"> </span><span class="n">stat</span><span class="p">,</span><span class="x"> </span><span class="n">strings</span><span class="o">.</span><span class="n">Join</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span><span class="x"> </span><span class="s">","</span><span class="p">))</span><span class="x">
 </span><span class="p">}</span><span class="x">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h2 id="writing-a-benchmark">Writing A Benchmark</h2>
 
@@ -67,7 +66,7 @@
 
 <p>Most benchmarks ultimately end up resembling this pattern:</p>
 
-<div class="language-golang highlighter-rouge"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">exLog</span><span class="p">()</span><span class="x"> </span><span class="p">{</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">exLog</span><span class="p">()</span><span class="x"> </span><span class="p">{</span><span class="x">
   </span><span class="n">log</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"bench"</span><span class="p">)</span><span class="x">
 </span><span class="p">}</span><span class="x">
 
@@ -76,8 +75,7 @@
       </span><span class="n">exLog</span><span class="p">()</span><span class="x">
     </span><span class="p">}</span><span class="x">
 </span><span class="p">}</span><span class="x">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>Under the hood, the <code class="highlighter-rouge">go test</code> tool will the execute code inside of the benchmark loop until a certain time limit is reached, at which point it is simple to derive performance characteristics from the number of iterations that finished and the resource consumption of your application during that time.</p>
 
@@ -85,27 +83,24 @@
 
 <p>For our <code class="highlighter-rouge">fmtStatStr</code> function, we don’t need a lot of prep-work and can write a straightforward benchmark:</p>
 
-<div class="language-golang highlighter-rouge"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">BenchmarkLogging</span><span class="p">(</span><span class="n">b</span><span class="x"> </span><span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">B</span><span class="p">)</span><span class="x"> </span><span class="p">{</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">BenchmarkLogging</span><span class="p">(</span><span class="n">b</span><span class="x"> </span><span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">B</span><span class="p">)</span><span class="x"> </span><span class="p">{</span><span class="x">
     </span><span class="k">for</span><span class="x"> </span><span class="n">i</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="m">0</span><span class="p">;</span><span class="x"> </span><span class="n">i</span><span class="x"> </span><span class="o">&lt;</span><span class="x"> </span><span class="n">b</span><span class="o">.</span><span class="n">N</span><span class="p">;</span><span class="x"> </span><span class="n">i</span><span class="o">++</span><span class="x"> </span><span class="p">{</span><span class="x">
       </span><span class="n">fmtStatStr</span><span class="p">(</span><span class="s">"handler.sample"</span><span class="p">,</span><span class="x"> </span><span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">"os"</span><span class="o">:</span><span class="x"> </span><span class="s">"osx"</span><span class="p">,</span><span class="x"> </span><span class="s">"locale"</span><span class="o">:</span><span class="x"> </span><span class="s">"en-US"</span><span class="p">})</span><span class="x">
     </span><span class="p">}</span><span class="x">
 </span><span class="p">}</span><span class="x">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h2 id="running-your-benchmark">Running your benchmark</h2>
 
 <p>You can run your benchmarks via the <code class="highlighter-rouge">go test</code> tool simply by adding a few flags, like so:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>go <span class="nb">test</span> -memprofile -bench<span class="o">=</span>.
-</code></pre>
-</div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go <span class="nb">test</span> <span class="nt">-memprofile</span> <span class="nt">-bench</span><span class="o">=</span><span class="nb">.</span>
+</code></pre></div></div>
 
 <p>After running this command and waiting a few seconds you should see something like this output to your terminal:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>BenchmarkLogging-4     1000000       1462 ns/op      584 B/op       14 allocs/op
-</code></pre>
-</div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BenchmarkLogging-4     1000000       1462 ns/op      584 B/op       14 allocs/op
+</code></pre></div></div>
 
 <p>The output can be read from right to left as</p>
 
@@ -123,7 +118,7 @@
 
 <p>After a little research we discovered that using <code class="highlighter-rouge">fmt.Printf</code> to concatenate and join strings is a fairly CPU and memory intensive process and that using a <a href="https://golang.org/pkg/bytes/#NewBufferString"><code class="highlighter-rouge">bytes.Buffer</code></a> is much more efficient means of achieving the same result. Armed with this knowledge we refactor our function to look like this:</p>
 
-<div class="language-golang highlighter-rouge"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">fmtStatStrOpt</span><span class="p">(</span><span class="n">stat</span><span class="x"> </span><span class="kt">string</span><span class="p">,</span><span class="x"> </span><span class="n">tags</span><span class="x"> </span><span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="kt">string</span><span class="x"> </span><span class="p">{</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">fmtStatStrOpt</span><span class="p">(</span><span class="n">stat</span><span class="x"> </span><span class="kt">string</span><span class="p">,</span><span class="x"> </span><span class="n">tags</span><span class="x"> </span><span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="kt">string</span><span class="x"> </span><span class="p">{</span><span class="x">
   </span><span class="n">b</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="n">bytes</span><span class="o">.</span><span class="n">NewBufferString</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span><span class="x">
   </span><span class="n">b</span><span class="o">.</span><span class="n">WriteString</span><span class="p">(</span><span class="s">"|"</span><span class="p">)</span><span class="x">
 
@@ -147,12 +142,11 @@
 
   </span><span class="k">return</span><span class="x"> </span><span class="n">b</span><span class="o">.</span><span class="n">String</span><span class="p">()</span><span class="x">
 </span><span class="p">}</span><span class="x">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>Now that we have two identical functions, we can compare their performance side to side and see which is better! To do so we add a new benchmark function and supply the same parameters to both tests.</p>
 
-<div class="language-golang highlighter-rouge"><pre class="highlight"><code><span class="k">var</span><span class="x"> </span><span class="n">test</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="k">struct</span><span class="x"> </span><span class="p">{</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">var</span><span class="x"> </span><span class="n">test</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="k">struct</span><span class="x"> </span><span class="p">{</span><span class="x">
   </span><span class="n">stat</span><span class="x"> </span><span class="kt">string</span><span class="x">
   </span><span class="n">tags</span><span class="x"> </span><span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="x">
 </span><span class="p">}{</span><span class="x">
@@ -168,22 +162,19 @@
     </span><span class="n">fmtStatStr</span><span class="p">(</span><span class="n">test</span><span class="o">.</span><span class="n">stat</span><span class="p">,</span><span class="x"> </span><span class="n">test</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span><span class="x">
   </span><span class="p">}</span><span class="x">
 </span><span class="p">}</span><span class="x">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>To run both of our benchmarks we can run the same command as before:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>go <span class="nb">test</span> -benchmem -bench<span class="o">=</span>.
-</code></pre>
-</div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go <span class="nb">test</span> <span class="nt">-benchmem</span> <span class="nt">-bench</span><span class="o">=</span><span class="nb">.</span>
+</code></pre></div></div>
 
 <p>Which should output something like:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>Benchmark_fmtStatStrBefore-4     1000000              1333 ns/op             248 B/op         12 allocs/op
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Benchmark_fmtStatStrBefore-4     1000000              1333 ns/op             248 B/op         12 allocs/op
 Benchmark_fmtStatStrAfter-4      3000000               492 ns/op             224 B/op          4 allocs/op
 PASS
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>At first glance our code immediately looks a lot better! Not only is our code faster (lower ns/op), but we are also doing fewer allocations per operation. Not too bad for a few minutes of work!</p>
 
@@ -201,7 +192,7 @@ PASS
 
 <p>Consider the following scenario:</p>
 
-<div class="language-golang highlighter-rouge"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">concat</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="x"> </span><span class="n">b</span><span class="x"> </span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="kt">string</span><span class="x"> </span><span class="p">{</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">concat</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="x"> </span><span class="n">b</span><span class="x"> </span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="kt">string</span><span class="x"> </span><span class="p">{</span><span class="x">
   </span><span class="k">return</span><span class="x"> </span><span class="n">a</span><span class="x"> </span><span class="o">+</span><span class="x"> </span><span class="n">b</span><span class="x">
 </span><span class="p">}</span><span class="x">
 
@@ -210,12 +201,11 @@ PASS
     </span><span class="n">concat</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="x"> </span><span class="n">b</span><span class="p">)</span><span class="x">
   </span><span class="p">}</span><span class="x">
 </span><span class="p">}</span><span class="x">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>Since <code class="highlighter-rouge">concat</code> is a <em>very</em> short function and its return value isn’t captured at its callsite, the <code class="highlighter-rouge">go</code> compiler may happily remove this function call for you - turning your benchmark into a really lame game of for-loop musical chairs. To save yourself from this benign mistake you can trick the compiler into thinking your code is more important than it really is by capturing return values in various scopes - like so:</p>
 
-<div class="language-golang highlighter-rouge"><pre class="highlight"><code><span class="c">// package level scope</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// package level scope</span><span class="x">
 </span><span class="k">var</span><span class="x"> </span><span class="n">concatRes</span><span class="x"> </span><span class="kt">string</span><span class="x">
 
 </span><span class="k">func</span><span class="x"> </span><span class="n">Benchmark_concat</span><span class="p">(</span><span class="n">b</span><span class="x"> </span><span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">B</span><span class="p">)</span><span class="x"> </span><span class="p">{</span><span class="x">
@@ -234,8 +224,7 @@ PASS
   </span><span class="c">// closure level escaping.</span><span class="x">
   </span><span class="n">concatRes</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="n">res</span><span class="x">
 </span><span class="p">}</span><span class="x">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>If you notice that your benchmarks are running <em>suspiciously</em> fast, you may want to to obfuscate your code and make it a little harder for the compiler to eliminate your slow code for you :)</p>
 
