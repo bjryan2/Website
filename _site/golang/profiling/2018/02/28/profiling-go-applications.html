@@ -52,104 +52,104 @@
 
 <p>We are going to be working with a small HTTP server which exposes a simple healthcheck API via <code class="highlighter-rouge">GET /ping</code>. For visibility, we have also included a small <a href="https://www.datadoghq.com/blog/statsd/"><code class="highlighter-rouge">statsd</code></a> client which records the latency of each request handled by the server. For simplicity, our code only is using the <code class="highlighter-rouge">go</code> stdlib but it should not seem too foreign you are used to using <code class="highlighter-rouge">gorilla/mux</code> or another popular library.</p>
 
-<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span><span class="x"> </span><span class="p">(</span><span class="x">
-    </span><span class="s">"fmt"</span><span class="x">
-    </span><span class="s">"log"</span><span class="x">
-    </span><span class="s">"net/http"</span><span class="x">
-    </span><span class="s">"strings"</span><span class="x">
-    </span><span class="s">"net"</span><span class="x">
-    </span><span class="s">"time"</span><span class="x">
-</span><span class="p">)</span><span class="x">
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"log"</span>
+    <span class="s">"net/http"</span>
+    <span class="s">"strings"</span>
+    <span class="s">"net"</span>
+    <span class="s">"time"</span>
+<span class="p">)</span>
 
-</span><span class="c">// SimpleClient is a thin statsd client.</span><span class="x">
-</span><span class="k">type</span><span class="x"> </span><span class="n">SimpleClient</span><span class="x"> </span><span class="k">struct</span><span class="x"> </span><span class="p">{</span><span class="x">
-    </span><span class="n">c</span><span class="x"> </span><span class="n">net</span><span class="o">.</span><span class="n">PacketConn</span><span class="x">
-    </span><span class="n">ra</span><span class="x"> </span><span class="o">*</span><span class="n">net</span><span class="o">.</span><span class="n">UDPAddr</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<span class="c">// SimpleClient is a thin statsd client.</span>
+<span class="k">type</span> <span class="n">SimpleClient</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">c</span> <span class="n">net</span><span class="o">.</span><span class="n">PacketConn</span>
+    <span class="n">ra</span> <span class="o">*</span><span class="n">net</span><span class="o">.</span><span class="n">UDPAddr</span>
+<span class="p">}</span>
 
-</span><span class="c">// NewSimpleClient instantiates a new SimpleClient instance which binds</span><span class="x">
-</span><span class="c">// to the provided UDP address.</span><span class="x">
-</span><span class="k">func</span><span class="x"> </span><span class="n">NewSimpleClient</span><span class="p">(</span><span class="n">addr</span><span class="x"> </span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">SimpleClient</span><span class="p">,</span><span class="x"> </span><span class="kt">error</span><span class="p">){</span><span class="x">
-    </span><span class="n">c</span><span class="p">,</span><span class="x"> </span><span class="n">err</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="n">net</span><span class="o">.</span><span class="n">ListenPacket</span><span class="p">(</span><span class="s">"udp"</span><span class="p">,</span><span class="x"> </span><span class="s">":0"</span><span class="p">)</span><span class="x">
-    </span><span class="k">if</span><span class="x"> </span><span class="n">err</span><span class="x"> </span><span class="o">!=</span><span class="x"> </span><span class="no">nil</span><span class="x"> </span><span class="p">{</span><span class="x">
-        </span><span class="k">return</span><span class="x"> </span><span class="no">nil</span><span class="p">,</span><span class="x"> </span><span class="n">err</span><span class="x">
-    </span><span class="p">}</span><span class="x">
+<span class="c">// NewSimpleClient instantiates a new SimpleClient instance which binds</span>
+<span class="c">// to the provided UDP address.</span>
+<span class="k">func</span> <span class="n">NewSimpleClient</span><span class="p">(</span><span class="n">addr</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="n">SimpleClient</span><span class="p">,</span> <span class="kt">error</span><span class="p">){</span>
+    <span class="n">c</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">net</span><span class="o">.</span><span class="n">ListenPacket</span><span class="p">(</span><span class="s">"udp"</span><span class="p">,</span> <span class="s">":0"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="no">nil</span><span class="p">,</span> <span class="n">err</span>
+    <span class="p">}</span>
 
-    </span><span class="n">ra</span><span class="p">,</span><span class="x"> </span><span class="n">err</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="n">net</span><span class="o">.</span><span class="n">ResolveUDPAddr</span><span class="p">(</span><span class="s">"udp"</span><span class="p">,</span><span class="x"> </span><span class="n">addr</span><span class="p">)</span><span class="x">
-    </span><span class="k">if</span><span class="x"> </span><span class="n">err</span><span class="x"> </span><span class="o">!=</span><span class="x"> </span><span class="no">nil</span><span class="x"> </span><span class="p">{</span><span class="x">
-        </span><span class="n">c</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span><span class="x">
-        </span><span class="k">return</span><span class="x"> </span><span class="no">nil</span><span class="p">,</span><span class="x"> </span><span class="n">err</span><span class="x">
-    </span><span class="p">}</span><span class="x">
+    <span class="n">ra</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">net</span><span class="o">.</span><span class="n">ResolveUDPAddr</span><span class="p">(</span><span class="s">"udp"</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="no">nil</span><span class="p">,</span> <span class="n">err</span>
+    <span class="p">}</span>
 
-    </span><span class="k">return</span><span class="x"> </span><span class="o">&amp;</span><span class="n">SimpleClient</span><span class="p">{</span><span class="x">
-        </span><span class="n">c</span><span class="o">:</span><span class="x">  </span><span class="n">c</span><span class="p">,</span><span class="x">
-        </span><span class="n">ra</span><span class="o">:</span><span class="x"> </span><span class="n">ra</span><span class="p">,</span><span class="x">
-    </span><span class="p">},</span><span class="x"> </span><span class="no">nil</span><span class="x">
-</span><span class="p">}</span><span class="x">
+    <span class="k">return</span> <span class="o">&amp;</span><span class="n">SimpleClient</span><span class="p">{</span>
+        <span class="n">c</span><span class="o">:</span>  <span class="n">c</span><span class="p">,</span>
+        <span class="n">ra</span><span class="o">:</span> <span class="n">ra</span><span class="p">,</span>
+    <span class="p">},</span> <span class="no">nil</span>
+<span class="p">}</span>
 
-</span><span class="c">// Timing sends a statsd timing call.</span><span class="x">
-</span><span class="k">func</span><span class="x"> </span><span class="p">(</span><span class="n">sc</span><span class="x"> </span><span class="o">*</span><span class="n">SimpleClient</span><span class="p">)</span><span class="x"> </span><span class="n">Timing</span><span class="p">(</span><span class="n">s</span><span class="x"> </span><span class="kt">string</span><span class="p">,</span><span class="x"> </span><span class="n">d</span><span class="x"> </span><span class="n">time</span><span class="o">.</span><span class="n">Duration</span><span class="p">,</span><span class="x"> </span><span class="n">sampleRate</span><span class="x"> </span><span class="kt">float64</span><span class="p">,</span><span class="x">
-    </span><span class="n">tags</span><span class="x"> </span><span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="kt">error</span><span class="x"> </span><span class="p">{</span><span class="x">
-    </span><span class="k">return</span><span class="x"> </span><span class="n">sc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">fmtStatStr</span><span class="p">(</span><span class="x">
-        </span><span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"%s:%d|ms"</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="x"> </span><span class="n">d</span><span class="o">/</span><span class="x"> </span><span class="n">time</span><span class="o">.</span><span class="n">Millisecond</span><span class="p">),</span><span class="x"> </span><span class="n">tags</span><span class="p">),</span><span class="x">
-    </span><span class="p">)</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<span class="c">// Timing sends a statsd timing call.</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">sc</span> <span class="o">*</span><span class="n">SimpleClient</span><span class="p">)</span> <span class="n">Timing</span><span class="p">(</span><span class="n">s</span> <span class="kt">string</span><span class="p">,</span> <span class="n">d</span> <span class="n">time</span><span class="o">.</span><span class="n">Duration</span><span class="p">,</span> <span class="n">sampleRate</span> <span class="kt">float64</span><span class="p">,</span>
+    <span class="n">tags</span> <span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">sc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">fmtStatStr</span><span class="p">(</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"%s:%d|ms"</span><span class="p">,</span><span class="n">s</span><span class="p">,</span> <span class="n">d</span><span class="o">/</span> <span class="n">time</span><span class="o">.</span><span class="n">Millisecond</span><span class="p">),</span> <span class="n">tags</span><span class="p">),</span>
+    <span class="p">)</span>
+<span class="p">}</span>
 
-</span><span class="k">func</span><span class="x"> </span><span class="p">(</span><span class="n">sc</span><span class="x"> </span><span class="o">*</span><span class="n">SimpleClient</span><span class="p">)</span><span class="x"> </span><span class="n">send</span><span class="p">(</span><span class="n">s</span><span class="x"> </span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="kt">error</span><span class="x"> </span><span class="p">{</span><span class="x">
-    </span><span class="n">_</span><span class="p">,</span><span class="x"> </span><span class="n">err</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="n">sc</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">net</span><span class="o">.</span><span class="n">UDPConn</span><span class="p">)</span><span class="o">.</span><span class="n">WriteToUDP</span><span class="p">([]</span><span class="kt">byte</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="x"> </span><span class="n">sc</span><span class="o">.</span><span class="n">ra</span><span class="p">)</span><span class="x">
-    </span><span class="k">if</span><span class="x"> </span><span class="n">err</span><span class="x"> </span><span class="o">!=</span><span class="x"> </span><span class="no">nil</span><span class="x"> </span><span class="p">{</span><span class="x">
-        </span><span class="k">return</span><span class="x"> </span><span class="n">err</span><span class="x">
-    </span><span class="p">}</span><span class="x">
+<span class="k">func</span> <span class="p">(</span><span class="n">sc</span> <span class="o">*</span><span class="n">SimpleClient</span><span class="p">)</span> <span class="n">send</span><span class="p">(</span><span class="n">s</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">net</span><span class="o">.</span><span class="n">UDPConn</span><span class="p">)</span><span class="o">.</span><span class="n">WriteToUDP</span><span class="p">([]</span><span class="kt">byte</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">sc</span><span class="o">.</span><span class="n">ra</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">err</span>
+    <span class="p">}</span>
 
-    </span><span class="k">return</span><span class="x">  </span><span class="no">nil</span><span class="x">
-</span><span class="p">}</span><span class="x">
+    <span class="k">return</span>  <span class="no">nil</span>
+<span class="p">}</span>
 
-</span><span class="k">func</span><span class="x"> </span><span class="n">fmtStatStr</span><span class="p">(</span><span class="n">stat</span><span class="x"> </span><span class="kt">string</span><span class="p">,</span><span class="x"> </span><span class="n">tags</span><span class="x"> </span><span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="kt">string</span><span class="x"> </span><span class="p">{</span><span class="x">
-    </span><span class="n">parts</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">{}</span><span class="x">
-    </span><span class="k">for</span><span class="x"> </span><span class="n">k</span><span class="p">,</span><span class="x"> </span><span class="n">v</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="k">range</span><span class="x"> </span><span class="n">tags</span><span class="x"> </span><span class="p">{</span><span class="x">
-        </span><span class="k">if</span><span class="x"> </span><span class="n">v</span><span class="x"> </span><span class="o">!=</span><span class="x"> </span><span class="s">""</span><span class="x"> </span><span class="p">{</span><span class="x">
-            </span><span class="n">parts</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="nb">append</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span><span class="x"> </span><span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"%s:%s"</span><span class="p">,</span><span class="x"> </span><span class="n">k</span><span class="p">,</span><span class="x"> </span><span class="n">v</span><span class="p">))</span><span class="x">
-        </span><span class="p">}</span><span class="x">
-    </span><span class="p">}</span><span class="x">
+<span class="k">func</span> <span class="n">fmtStatStr</span><span class="p">(</span><span class="n">stat</span> <span class="kt">string</span><span class="p">,</span> <span class="n">tags</span> <span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span> <span class="kt">string</span> <span class="p">{</span>
+    <span class="n">parts</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">tags</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">!=</span> <span class="s">""</span> <span class="p">{</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="nb">append</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"%s:%s"</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
 
-    </span><span class="k">return</span><span class="x"> </span><span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"%s|%s"</span><span class="p">,</span><span class="x"> </span><span class="n">stat</span><span class="p">,</span><span class="x"> </span><span class="n">strings</span><span class="o">.</span><span class="n">Join</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span><span class="x"> </span><span class="s">","</span><span class="p">))</span><span class="x">
-</span><span class="p">}</span><span class="x">
+    <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"%s|%s"</span><span class="p">,</span> <span class="n">stat</span><span class="p">,</span> <span class="n">strings</span><span class="o">.</span><span class="n">Join</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span> <span class="s">","</span><span class="p">))</span>
+<span class="p">}</span>
 
-</span><span class="k">func</span><span class="x"> </span><span class="n">main</span><span class="p">()</span><span class="x"> </span><span class="p">{</span><span class="x">
-    </span><span class="n">stats</span><span class="p">,</span><span class="x"> </span><span class="n">err</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="n">NewSimpleClient</span><span class="p">(</span><span class="s">"localhost:6060"</span><span class="p">)</span><span class="x">
-    </span><span class="k">if</span><span class="x"> </span><span class="n">err</span><span class="x"> </span><span class="o">!=</span><span class="x"> </span><span class="no">nil</span><span class="x"> </span><span class="p">{</span><span class="x">
-        </span><span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="s">"could not start stas client: "</span><span class="p">,</span><span class="x"> </span><span class="n">err</span><span class="p">)</span><span class="x">
-    </span><span class="p">}</span><span class="x">
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">stats</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">NewSimpleClient</span><span class="p">(</span><span class="s">"localhost:6060"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="s">"could not start stas client: "</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
 
-    </span><span class="c">// add handlers to default mux</span><span class="x">
-    </span><span class="n">http</span><span class="o">.</span><span class="n">HandleFunc</span><span class="p">(</span><span class="s">"/ping"</span><span class="p">,</span><span class="x"> </span><span class="n">pingHandler</span><span class="p">(</span><span class="n">stats</span><span class="p">))</span><span class="x">
+    <span class="c">// add handlers to default mux</span>
+    <span class="n">http</span><span class="o">.</span><span class="n">HandleFunc</span><span class="p">(</span><span class="s">"/ping"</span><span class="p">,</span> <span class="n">pingHandler</span><span class="p">(</span><span class="n">stats</span><span class="p">))</span>
 
-    </span><span class="n">s</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="o">&amp;</span><span class="n">http</span><span class="o">.</span><span class="n">Server</span><span class="p">{</span><span class="x">
-        </span><span class="n">Addr</span><span class="o">:</span><span class="x">    </span><span class="s">":8080"</span><span class="p">,</span><span class="x">
-    </span><span class="p">}</span><span class="x">
+    <span class="n">s</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="n">http</span><span class="o">.</span><span class="n">Server</span><span class="p">{</span>
+        <span class="n">Addr</span><span class="o">:</span>    <span class="s">":8080"</span><span class="p">,</span>
+    <span class="p">}</span>
 
-    </span><span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">ListenAndServe</span><span class="p">())</span><span class="x">
-</span><span class="p">}</span><span class="x">
+    <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">ListenAndServe</span><span class="p">())</span>
+<span class="p">}</span>
 
-</span><span class="k">func</span><span class="x"> </span><span class="n">pingHandler</span><span class="p">(</span><span class="n">s</span><span class="x"> </span><span class="o">*</span><span class="n">SimpleClient</span><span class="p">)</span><span class="x"> </span><span class="n">http</span><span class="o">.</span><span class="n">HandlerFunc</span><span class="p">{</span><span class="x">
-    </span><span class="k">return</span><span class="x"> </span><span class="k">func</span><span class="p">(</span><span class="n">w</span><span class="x"> </span><span class="n">http</span><span class="o">.</span><span class="n">ResponseWriter</span><span class="p">,</span><span class="x"> </span><span class="n">r</span><span class="x"> </span><span class="o">*</span><span class="n">http</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span><span class="x"> </span><span class="p">{</span><span class="x">
-        </span><span class="n">st</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="n">time</span><span class="o">.</span><span class="n">Now</span><span class="p">()</span><span class="x">
-        </span><span class="k">defer</span><span class="x"> </span><span class="k">func</span><span class="p">()</span><span class="x"> </span><span class="p">{</span><span class="x">
-            </span><span class="n">_</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="n">s</span><span class="o">.</span><span class="n">Timing</span><span class="p">(</span><span class="s">"http.ping"</span><span class="p">,</span><span class="x"> </span><span class="n">time</span><span class="o">.</span><span class="n">Since</span><span class="p">(</span><span class="n">st</span><span class="p">),</span><span class="x"> </span><span class="m">1.0</span><span class="p">,</span><span class="x"> </span><span class="no">nil</span><span class="p">)</span><span class="x">
-        </span><span class="p">}()</span><span class="x">
+<span class="k">func</span> <span class="n">pingHandler</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span><span class="n">SimpleClient</span><span class="p">)</span> <span class="n">http</span><span class="o">.</span><span class="n">HandlerFunc</span><span class="p">{</span>
+    <span class="k">return</span> <span class="k">func</span><span class="p">(</span><span class="n">w</span> <span class="n">http</span><span class="o">.</span><span class="n">ResponseWriter</span><span class="p">,</span> <span class="n">r</span> <span class="o">*</span><span class="n">http</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">st</span> <span class="o">:=</span> <span class="n">time</span><span class="o">.</span><span class="n">Now</span><span class="p">()</span>
+        <span class="k">defer</span> <span class="k">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">Timing</span><span class="p">(</span><span class="s">"http.ping"</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">Since</span><span class="p">(</span><span class="n">st</span><span class="p">),</span> <span class="m">1.0</span><span class="p">,</span> <span class="no">nil</span><span class="p">)</span>
+        <span class="p">}()</span>
 
-        </span><span class="n">w</span><span class="o">.</span><span class="n">WriteHeader</span><span class="p">(</span><span class="m">200</span><span class="p">)</span><span class="x">
-    </span><span class="p">}}</span><span class="x">
-</span></code></pre></div></div>
+        <span class="n">w</span><span class="o">.</span><span class="n">WriteHeader</span><span class="p">(</span><span class="m">200</span><span class="p">)</span>
+    <span class="p">}}</span>
+</code></pre></div></div>
 
 <h2 id="installing-profiling-tools">Installing Profiling Tools</h2>
 
 <p>The go stdlib comes with “batteries included” diagnosing performance issues, and there is a rich ecosystem of tools which can hook into go’s simple, efficient, runtime. If you are using the default <code class="highlighter-rouge">http.DefaultServeMux</code> for your application, integrating <code class="highlighter-rouge">pprof</code> should require no more code than adding the following statement to your <code class="highlighter-rouge">import</code> header:</p>
 
-<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span><span class="x"> </span><span class="p">(</span><span class="x">
-  </span><span class="n">_</span><span class="x"> </span><span class="s">"net/http/pprof"</span><span class="x">
-</span><span class="p">)</span><span class="x">
-</span></code></pre></div></div>
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">(</span>
+  <span class="n">_</span> <span class="s">"net/http/pprof"</span>
+<span class="p">)</span>
+</code></pre></div></div>
 
 <p>You can verify that you setup everything correctly by starting up the server and visiting
 <code class="highlighter-rouge">/debug/pprof</code> in any web browser. For our example application - the <code class="highlighter-rouge">pprof</code> interface is exposed
@@ -200,22 +200,22 @@ tone and intensity are provided only as a means to make the diagram easier to re
 <p>For instance, in our program we can dive into one of the larger slices and see that we are spending roughly 10% (!) of our time flushing results over a network socket in our statter! Luckily, fixing this is simple - by adding a small buffer to our code, we are able to clean up this issue and produce a new, slimmer graph.</p>
 
 <p><strong>Code Change</strong></p>
-<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="p">(</span><span class="n">sc</span><span class="x"> </span><span class="o">*</span><span class="n">SimpleClient</span><span class="p">)</span><span class="x"> </span><span class="n">send</span><span class="p">(</span><span class="n">s</span><span class="x"> </span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="kt">error</span><span class="x"> </span><span class="p">{</span><span class="x">
-    </span><span class="n">sc</span><span class="o">.</span><span class="n">buffer</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="nb">append</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span><span class="x"> </span><span class="n">s</span><span class="p">)</span><span class="x">
-    </span><span class="k">if</span><span class="x"> </span><span class="nb">len</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span><span class="x"> </span><span class="o">&gt;</span><span class="x"> </span><span class="n">bufferCapacity</span><span class="x"> </span><span class="p">{</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="p">(</span><span class="n">sc</span> <span class="o">*</span><span class="n">SimpleClient</span><span class="p">)</span> <span class="n">send</span><span class="p">(</span><span class="n">s</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="nb">append</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">bufferCapacity</span> <span class="p">{</span>
 
-        </span><span class="n">b</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="n">strings</span><span class="o">.</span><span class="n">Join</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span><span class="x"> </span><span class="s">","</span><span class="p">)</span><span class="x">
-        </span><span class="n">_</span><span class="p">,</span><span class="x"> </span><span class="n">err</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="n">sc</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">net</span><span class="o">.</span><span class="n">UDPConn</span><span class="p">)</span><span class="o">.</span><span class="n">WriteToUDP</span><span class="p">([]</span><span class="kt">byte</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="x"> </span><span class="n">sc</span><span class="o">.</span><span class="n">ra</span><span class="p">)</span><span class="x">
-        </span><span class="k">if</span><span class="x"> </span><span class="n">err</span><span class="x"> </span><span class="o">!=</span><span class="x"> </span><span class="no">nil</span><span class="x"> </span><span class="p">{</span><span class="x">
-            </span><span class="k">return</span><span class="x"> </span><span class="n">err</span><span class="x">
-        </span><span class="p">}</span><span class="x">
+        <span class="n">b</span> <span class="o">:=</span> <span class="n">strings</span><span class="o">.</span><span class="n">Join</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span> <span class="s">","</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">net</span><span class="o">.</span><span class="n">UDPConn</span><span class="p">)</span><span class="o">.</span><span class="n">WriteToUDP</span><span class="p">([]</span><span class="kt">byte</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">sc</span><span class="o">.</span><span class="n">ra</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">err</span>
+        <span class="p">}</span>
 
-        </span><span class="n">sc</span><span class="o">.</span><span class="n">buffer</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="no">nil</span><span class="x">
-    </span><span class="p">}</span><span class="x">
+        <span class="n">sc</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="no">nil</span>
+    <span class="p">}</span>
 
-    </span><span class="k">return</span><span class="x">  </span><span class="no">nil</span><span class="x">
-</span><span class="p">}</span><span class="x">
-</span></code></pre></div></div>
+    <span class="k">return</span>  <span class="no">nil</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
 <p><strong>New flamegraph</strong></p>
 

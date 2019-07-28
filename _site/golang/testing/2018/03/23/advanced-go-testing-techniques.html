@@ -50,48 +50,48 @@
 
 <p>An example of this technique is as follows:</p>
 
-<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span><span class="x"> </span><span class="n">TestfmtStatStr</span><span class="p">(</span><span class="n">t</span><span class="x"> </span><span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">T</span><span class="p">){</span><span class="x">
-	</span><span class="n">tests</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="p">[]</span><span class="k">struct</span><span class="p">{</span><span class="x">
-		</span><span class="n">msg</span><span class="x"> </span><span class="kt">string</span><span class="x">
-		</span><span class="n">stat</span><span class="x"> </span><span class="kt">string</span><span class="x">
-		</span><span class="n">tags</span><span class="x"> </span><span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="x">
-		</span><span class="n">exp</span><span class="x"> </span><span class="kt">string</span><span class="x">
-	</span><span class="p">}{</span><span class="x">
-		</span><span class="p">{</span><span class="x">
-			</span><span class="s">"empty string and tags"</span><span class="p">,</span><span class="x">
-			</span><span class="s">""</span><span class="p">,</span><span class="x">
-			</span><span class="no">nil</span><span class="p">,</span><span class="x">
-			</span><span class="s">""</span><span class="p">,</span><span class="x">
-		</span><span class="p">},</span><span class="x">
-		</span><span class="p">{</span><span class="x">
-			</span><span class="s">"empty tags"</span><span class="p">,</span><span class="x">
-			</span><span class="s">"handler.latency"</span><span class="p">,</span><span class="x">
-			</span><span class="no">nil</span><span class="p">,</span><span class="x">
-			</span><span class="s">"foo"</span><span class="p">,</span><span class="x">
-		</span><span class="p">},</span><span class="x">
-		</span><span class="p">{</span><span class="x">
-			</span><span class="s">"with tags"</span><span class="p">,</span><span class="x">
-			</span><span class="s">"handler.latency"</span><span class="p">,</span><span class="x">
-			</span><span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="x">
-				</span><span class="s">"host"</span><span class="o">:</span><span class="x"> </span><span class="s">"aws_"</span><span class="p">,</span><span class="x">
-				</span><span class="s">"service"</span><span class="o">:</span><span class="x"> </span><span class="s">"users"</span><span class="p">,</span><span class="x">
-			</span><span class="p">},</span><span class="x">
-			</span><span class="s">"foo"</span><span class="p">,</span><span class="x">
-		</span><span class="p">},</span><span class="x">
-	</span><span class="p">}</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">TestfmtStatStr</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">T</span><span class="p">){</span>
+	<span class="n">tests</span> <span class="o">:=</span> <span class="p">[]</span><span class="k">struct</span><span class="p">{</span>
+		<span class="n">msg</span> <span class="kt">string</span>
+		<span class="n">stat</span> <span class="kt">string</span>
+		<span class="n">tags</span> <span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span>
+		<span class="n">exp</span> <span class="kt">string</span>
+	<span class="p">}{</span>
+		<span class="p">{</span>
+			<span class="s">"empty string and tags"</span><span class="p">,</span>
+			<span class="s">""</span><span class="p">,</span>
+			<span class="no">nil</span><span class="p">,</span>
+			<span class="s">""</span><span class="p">,</span>
+		<span class="p">},</span>
+		<span class="p">{</span>
+			<span class="s">"empty tags"</span><span class="p">,</span>
+			<span class="s">"handler.latency"</span><span class="p">,</span>
+			<span class="no">nil</span><span class="p">,</span>
+			<span class="s">"foo"</span><span class="p">,</span>
+		<span class="p">},</span>
+		<span class="p">{</span>
+			<span class="s">"with tags"</span><span class="p">,</span>
+			<span class="s">"handler.latency"</span><span class="p">,</span>
+			<span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span>
+				<span class="s">"host"</span><span class="o">:</span> <span class="s">"aws_"</span><span class="p">,</span>
+				<span class="s">"service"</span><span class="o">:</span> <span class="s">"users"</span><span class="p">,</span>
+			<span class="p">},</span>
+			<span class="s">"foo"</span><span class="p">,</span>
+		<span class="p">},</span>
+	<span class="p">}</span>
 
-	</span><span class="k">for</span><span class="x"> </span><span class="n">_</span><span class="x">  </span><span class="p">,</span><span class="x"> </span><span class="n">tt</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="k">range</span><span class="x"> </span><span class="n">tests</span><span class="x"> </span><span class="p">{</span><span class="x">
-		</span><span class="n">tt</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="n">tt</span><span class="x">
-		</span><span class="n">t</span><span class="o">.</span><span class="n">Run</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span><span class="x"> </span><span class="k">func</span><span class="p">(</span><span class="n">t</span><span class="x"> </span><span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="x"> </span><span class="p">{</span><span class="x">
-		    </span><span class="n">t</span><span class="o">.</span><span class="n">Parallel</span><span class="p">()</span><span class="x"> </span><span class="c">// run sub-tests in parallel</span><span class="x">
-		    </span><span class="n">res</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="n">fmtStatStr</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">st</span><span class="p">,</span><span class="x"> </span><span class="n">tt</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span><span class="x"> 
-		    </span><span class="k">if</span><span class="x"> </span><span class="n">tt</span><span class="o">.</span><span class="n">exp</span><span class="x"> </span><span class="o">!=</span><span class="x"> </span><span class="n">res</span><span class="x"> </span><span class="p">{</span><span class="x">
-		        </span><span class="n">t</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">"exp:"</span><span class="p">,</span><span class="x"> </span><span class="n">tt</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span><span class="x"> </span><span class="s">"got:"</span><span class="p">,</span><span class="x"> </span><span class="n">res</span><span class="p">)</span><span class="x">
-		    </span><span class="p">}</span><span class="x">
-		</span><span class="p">})</span><span class="x">
-	</span><span class="p">}</span><span class="x">
-</span><span class="p">}</span><span class="x">
-</span></code></pre></div></div>
+	<span class="k">for</span> <span class="n">_</span>  <span class="p">,</span> <span class="n">tt</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">tests</span> <span class="p">{</span>
+		<span class="n">tt</span> <span class="o">:=</span> <span class="n">tt</span>
+		<span class="n">t</span><span class="o">.</span><span class="n">Run</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="k">func</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="p">{</span>
+		    <span class="n">t</span><span class="o">.</span><span class="n">Parallel</span><span class="p">()</span> <span class="c">// run sub-tests in parallel</span>
+		    <span class="n">res</span> <span class="o">:=</span> <span class="n">fmtStatStr</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">st</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span> 
+		    <span class="k">if</span> <span class="n">tt</span><span class="o">.</span><span class="n">exp</span> <span class="o">!=</span> <span class="n">res</span> <span class="p">{</span>
+		        <span class="n">t</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">"exp:"</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span> <span class="s">"got:"</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+		    <span class="p">}</span>
+		<span class="p">})</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
 <h2 id="external-test-packages">External Test Packages</h2>
 
@@ -116,33 +116,33 @@
 
 <p>The pattern is particularly useful when testing the <code class="highlighter-rouge">time.Ticker</code> object - as illustrated below:</p>
 
-<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">var</span><span class="x"> </span><span class="p">(</span><span class="x">
-	</span><span class="n">timeMultiplier</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="m">1.0</span><span class="x">
-	</span><span class="n">batchMaxAge</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="x">
-	</span><span class="n">batchSize</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="m">25</span><span class="x">
-</span><span class="p">)</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">var</span> <span class="p">(</span>
+	<span class="n">timeMultiplier</span> <span class="o">=</span> <span class="m">1.0</span>
+	<span class="n">batchMaxAge</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">Second</span>
+	<span class="n">batchSize</span> <span class="o">=</span> <span class="m">25</span>
+<span class="p">)</span>
 
-</span><span class="c">// flushEvents listens for new events on the `events` channel and sends</span><span class="x">
-</span><span class="c">// them to the events client in batches of size `batchSize`. </span><span class="x">
-</span><span class="k">func</span><span class="x"> </span><span class="n">flushEvents</span><span class="p">(</span><span class="n">events</span><span class="x"> </span><span class="o">&lt;-</span><span class="x"> </span><span class="k">chan</span><span class="x"> </span><span class="kt">string</span><span class="p">)</span><span class="x"> </span><span class="p">{</span><span class="x">
+<span class="c">// flushEvents listens for new events on the `events` channel and sends</span>
+<span class="c">// them to the events client in batches of size `batchSize`. </span>
+<span class="k">func</span> <span class="n">flushEvents</span><span class="p">(</span><span class="n">events</span> <span class="o">&lt;-</span> <span class="k">chan</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
 
-	</span><span class="k">var</span><span class="x"> </span><span class="n">batch</span><span class="x"> </span><span class="p">[]</span><span class="kt">string</span><span class="x">
-	</span><span class="k">select</span><span class="x"> </span><span class="p">{</span><span class="x">
+	<span class="k">var</span> <span class="n">batch</span> <span class="p">[]</span><span class="kt">string</span>
+	<span class="k">select</span> <span class="p">{</span>
 	
-	</span><span class="k">case</span><span class="x"> </span><span class="n">e</span><span class="x"> </span><span class="o">:=</span><span class="x"> </span><span class="o">&lt;-</span><span class="x"> </span><span class="n">events</span><span class="o">:</span><span class="x">
-		</span><span class="n">batch</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="nb">append</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span><span class="x"> </span><span class="n">e</span><span class="p">)</span><span class="x">
+	<span class="k">case</span> <span class="n">e</span> <span class="o">:=</span> <span class="o">&lt;-</span> <span class="n">events</span><span class="o">:</span>
+		<span class="n">batch</span> <span class="o">=</span> <span class="nb">append</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 
-		</span><span class="k">if</span><span class="x"> </span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span><span class="x"> </span><span class="o">&gt;=</span><span class="x"> </span><span class="n">batchSize</span><span class="x"> </span><span class="p">{</span><span class="x">
-			</span><span class="n">log</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"flushing batch of events"</span><span class="p">)</span><span class="x">
-			</span><span class="n">batch</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="no">nil</span><span class="x">
-		</span><span class="p">}</span><span class="x">
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">batchSize</span> <span class="p">{</span>
+			<span class="n">log</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"flushing batch of events"</span><span class="p">)</span>
+			<span class="n">batch</span> <span class="o">=</span> <span class="no">nil</span>
+		<span class="p">}</span>
 		
-	</span><span class="k">case</span><span class="x"> </span><span class="o">&lt;-</span><span class="n">time</span><span class="o">.</span><span class="n">Tick</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="n">timeMultiplier</span><span class="p">)</span><span class="x"> </span><span class="o">*</span><span class="x"> </span><span class="n">batchMaxAge</span><span class="p">)</span><span class="o">:</span><span class="x">
-		</span><span class="n">log</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"flushing batch of stale events"</span><span class="p">)</span><span class="x">
-		</span><span class="n">batch</span><span class="x"> </span><span class="o">=</span><span class="x"> </span><span class="no">nil</span><span class="x">
-	</span><span class="p">}</span><span class="x">
-</span><span class="p">}</span><span class="x">
-</span></code></pre></div></div>
+	<span class="k">case</span> <span class="o">&lt;-</span><span class="n">time</span><span class="o">.</span><span class="n">Tick</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="n">timeMultiplier</span><span class="p">)</span> <span class="o">*</span> <span class="n">batchMaxAge</span><span class="p">)</span><span class="o">:</span>
+		<span class="n">log</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"flushing batch of stale events"</span><span class="p">)</span>
+		<span class="n">batch</span> <span class="o">=</span> <span class="no">nil</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
 <h2 id="embedding-types">Embedding Types</h2>
 
@@ -150,63 +150,63 @@
 
 <p>A common use case for this pattern is “setting up” and “tearing down” datastore resources like thus:</p>
 
-<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// User represents a user in our application.</span><span class="x">
-</span><span class="k">type</span><span class="x"> </span><span class="n">User</span><span class="x"> </span><span class="k">struct</span><span class="x"> </span><span class="p">{</span><span class="x">
-	</span><span class="n">Id</span><span class="x"> </span><span class="kt">int64</span><span class="x">
-	</span><span class="n">FirstName</span><span class="x"> </span><span class="kt">string</span><span class="x">
-	</span><span class="n">LastName</span><span class="x"> </span><span class="kt">string</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// User represents a user in our application.</span>
+<span class="k">type</span> <span class="n">User</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Id</span> <span class="kt">int64</span>
+	<span class="n">FirstName</span> <span class="kt">string</span>
+	<span class="n">LastName</span> <span class="kt">string</span>
+<span class="p">}</span>
 
-</span><span class="c">// UserMutator defines a type which is able to mutate and persist User data. </span><span class="x">
-</span><span class="k">type</span><span class="x"> </span><span class="n">UserMutator</span><span class="x"> </span><span class="k">interface</span><span class="x"> </span><span class="p">{</span><span class="x">
-	</span><span class="n">Fetch</span><span class="p">(</span><span class="kt">int64</span><span class="p">)</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span><span class="x"> </span><span class="kt">error</span><span class="p">)</span><span class="x">
-	</span><span class="n">Create</span><span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">)</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span><span class="x"> </span><span class="kt">error</span><span class="p">)</span><span class="x">
-	</span><span class="n">Update</span><span class="p">(</span><span class="kt">int64</span><span class="p">,</span><span class="x"> </span><span class="o">*</span><span class="n">User</span><span class="p">)</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span><span class="x"> </span><span class="kt">error</span><span class="p">)</span><span class="x">
-	</span><span class="n">Delete</span><span class="p">(</span><span class="kt">int64</span><span class="p">)</span><span class="x"> </span><span class="kt">error</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<span class="c">// UserMutator defines a type which is able to mutate and persist User data. </span>
+<span class="k">type</span> <span class="n">UserMutator</span> <span class="k">interface</span> <span class="p">{</span>
+	<span class="n">Fetch</span><span class="p">(</span><span class="kt">int64</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+	<span class="n">Create</span><span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+	<span class="n">Update</span><span class="p">(</span><span class="kt">int64</span><span class="p">,</span> <span class="o">*</span><span class="n">User</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+	<span class="n">Delete</span><span class="p">(</span><span class="kt">int64</span><span class="p">)</span> <span class="kt">error</span>
+<span class="p">}</span>
 
-</span><span class="c">// UserManager handles datastore operations for 'user' data.</span><span class="x">
-</span><span class="k">type</span><span class="x"> </span><span class="n">UserManager</span><span class="x"> </span><span class="k">struct</span><span class="x"> </span><span class="p">{</span><span class="x">
-	</span><span class="c">// database tables, caches, etc...</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<span class="c">// UserManager handles datastore operations for 'user' data.</span>
+<span class="k">type</span> <span class="n">UserManager</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="c">// database tables, caches, etc...</span>
+<span class="p">}</span>
 
-</span><span class="c">// Fetch retrieves a single user model keyed by id.</span><span class="x">
-</span><span class="k">func</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">UserManager</span><span class="p">)</span><span class="x"> </span><span class="n">Fetch</span><span class="p">(</span><span class="n">id</span><span class="x"> </span><span class="kt">int64</span><span class="p">)</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span><span class="x"> </span><span class="kt">error</span><span class="p">)</span><span class="x"> </span><span class="p">{</span><span class="x">
-	</span><span class="k">return</span><span class="x"> </span><span class="no">nil</span><span class="p">,</span><span class="x"> </span><span class="no">nil</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<span class="c">// Fetch retrieves a single user model keyed by id.</span>
+<span class="k">func</span> <span class="p">(</span><span class="o">*</span><span class="n">UserManager</span><span class="p">)</span> <span class="n">Fetch</span><span class="p">(</span><span class="n">id</span> <span class="kt">int64</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="no">nil</span><span class="p">,</span> <span class="no">nil</span>
+<span class="p">}</span>
 
-</span><span class="c">// Create instantiates a new user model</span><span class="x">
-</span><span class="k">func</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">UserManager</span><span class="p">)</span><span class="x"> </span><span class="n">Create</span><span class="p">(</span><span class="n">u</span><span class="x"> </span><span class="o">*</span><span class="n">User</span><span class="p">)</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span><span class="x"> </span><span class="kt">error</span><span class="p">)</span><span class="x"> </span><span class="p">{</span><span class="x">
-	</span><span class="k">return</span><span class="x"> </span><span class="no">nil</span><span class="p">,</span><span class="x"> </span><span class="no">nil</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<span class="c">// Create instantiates a new user model</span>
+<span class="k">func</span> <span class="p">(</span><span class="o">*</span><span class="n">UserManager</span><span class="p">)</span> <span class="n">Create</span><span class="p">(</span><span class="n">u</span> <span class="o">*</span><span class="n">User</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="no">nil</span><span class="p">,</span> <span class="no">nil</span>
+<span class="p">}</span>
 
-</span><span class="c">// Update updates the user keyed by the provided id to a new state.</span><span class="x">
-</span><span class="k">func</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">UserManager</span><span class="p">)</span><span class="x"> </span><span class="n">Update</span><span class="p">(</span><span class="n">id</span><span class="x"> </span><span class="kt">int64</span><span class="p">,</span><span class="x"> </span><span class="n">u</span><span class="x"> </span><span class="o">*</span><span class="n">User</span><span class="p">)</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span><span class="x"> </span><span class="kt">error</span><span class="p">)</span><span class="x"> </span><span class="p">{</span><span class="x">
-	</span><span class="k">return</span><span class="x"> </span><span class="no">nil</span><span class="p">,</span><span class="x"> </span><span class="no">nil</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<span class="c">// Update updates the user keyed by the provided id to a new state.</span>
+<span class="k">func</span> <span class="p">(</span><span class="o">*</span><span class="n">UserManager</span><span class="p">)</span> <span class="n">Update</span><span class="p">(</span><span class="n">id</span> <span class="kt">int64</span><span class="p">,</span> <span class="n">u</span> <span class="o">*</span><span class="n">User</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="n">User</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="no">nil</span><span class="p">,</span> <span class="no">nil</span>
+<span class="p">}</span>
 
-</span><span class="c">// Delete deletes the user keyed by the provided id.</span><span class="x">
-</span><span class="k">func</span><span class="x"> </span><span class="p">(</span><span class="o">*</span><span class="n">UserManager</span><span class="p">)</span><span class="x"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="x"> </span><span class="kt">int64</span><span class="p">)</span><span class="x"> </span><span class="kt">error</span><span class="x"> </span><span class="p">{</span><span class="x">
-	</span><span class="k">return</span><span class="x"> </span><span class="no">nil</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<span class="c">// Delete deletes the user keyed by the provided id.</span>
+<span class="k">func</span> <span class="p">(</span><span class="o">*</span><span class="n">UserManager</span><span class="p">)</span> <span class="n">Delete</span><span class="p">(</span><span class="n">id</span> <span class="kt">int64</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="no">nil</span>
+<span class="p">}</span>
 
-</span><span class="c">// UserManagerCreator wraps a UserManager and provides additional</span><span class="x">
-</span><span class="c">// functionality for setting up and tearing down this manager's underlying</span><span class="x">
-</span><span class="c">// datastores.</span><span class="x">
-</span><span class="k">type</span><span class="x"> </span><span class="n">UserManagerCreator</span><span class="x"> </span><span class="k">struct</span><span class="x"> </span><span class="p">{</span><span class="x">
-	</span><span class="n">UserManager</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<span class="c">// UserManagerCreator wraps a UserManager and provides additional</span>
+<span class="c">// functionality for setting up and tearing down this manager's underlying</span>
+<span class="c">// datastores.</span>
+<span class="k">type</span> <span class="n">UserManagerCreator</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">UserManager</span>
+<span class="p">}</span>
 
-</span><span class="c">// Setup instantiates resources used by this manager.</span><span class="x">
-</span><span class="k">func</span><span class="x"> </span><span class="p">(</span><span class="n">u</span><span class="x"> </span><span class="o">*</span><span class="n">UserManagerCreator</span><span class="p">)</span><span class="x"> </span><span class="n">Setup</span><span class="p">()</span><span class="x"> </span><span class="kt">error</span><span class="x"> </span><span class="p">{</span><span class="x">
-	</span><span class="k">return</span><span class="x"> </span><span class="no">nil</span><span class="x">
-</span><span class="p">}</span><span class="x">
+<span class="c">// Setup instantiates resources used by this manager.</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span><span class="n">UserManagerCreator</span><span class="p">)</span> <span class="n">Setup</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="no">nil</span>
+<span class="p">}</span>
 
-</span><span class="c">// Teardown cleans up resources used by this manager.</span><span class="x">
-</span><span class="k">func</span><span class="x"> </span><span class="p">(</span><span class="n">u</span><span class="x"> </span><span class="o">*</span><span class="n">UserManagerCreator</span><span class="p">)</span><span class="x"> </span><span class="n">Teardown</span><span class="p">()</span><span class="x"> </span><span class="kt">error</span><span class="x"> </span><span class="p">{</span><span class="x">
-	</span><span class="k">return</span><span class="x"> </span><span class="no">nil</span><span class="x">
-</span><span class="p">}</span><span class="x">
-</span></code></pre></div></div>
+<span class="c">// Teardown cleans up resources used by this manager.</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span><span class="n">UserManagerCreator</span><span class="p">)</span> <span class="n">Teardown</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="no">nil</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
 <h2 id="further-readings">Further Readings</h2>
 
