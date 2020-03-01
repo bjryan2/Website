@@ -23,7 +23,7 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.0/css/tachyons.min.css"/>
-  <link rel="stylesheet" type="text/css" href="/assets/css/styles.css" />
+  <link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/styles.css" />
   <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
 
 </head>
@@ -153,7 +153,7 @@
 
 <p>You can verify that you setup everything correctly by starting up the server and visiting
 <code class="highlighter-rouge">/debug/pprof</code> in any web browser. For our example application - the <code class="highlighter-rouge">pprof</code> interface is exposed
- at <code class="highlighter-rouge">localhost:8080/debug/pprof</code>.</p>
+at <code class="highlighter-rouge">localhost:8080/debug/pprof</code>.</p>
 
 <h2 id="generating-a-flamegraph">Generating a Flamegraph</h2>
 
@@ -182,24 +182,25 @@ docker run uber/go-torch <span class="nt">-u</span> http://&lt;host ip&gt;:8080/
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>open <span class="nt">-a</span> <span class="sb">`</span>Google Chrome<span class="sb">`</span> torch.svg
 </code></pre></div></div>
 
-<p><img src="/assets/img/before_box.png" alt="before" /></p>
+<p><img src="/assets/img/flamegraphs/before_box.png" alt="before" /></p>
 
 <h2 id="reading-flamegraphs">Reading Flamegraphs</h2>
 
-<p>Each horizontal segment in the flamegraph represents a single stack frame, with its width determined by the relative (<em>%</em>) amount of time that your program was observed to be evaluating that frame during the sampling process. These segments are organized vertically into “flames” based on their position in the call-stack, meaning that those functions further up the y-axis are called by  functions at the base of the graph - and inherently are responsible for a smaller slice of CPU-time. If you want to dive deeper into one part of the visualization you can simply click on a frame and all frames below it will disappear and the UI will resize itself.</p>
+<p>Each horizontal segment in the flamegraph represents a single stack frame, with its width determined by the relative (<em>%</em>) amount of time that your program was observed to be evaluating that frame during the sampling process. These segments are organized vertically into “flames” based on their position in the call-stack, meaning that those functions further up the y-axis are called by functions at the base of the graph - and inherently are responsible for a smaller slice of CPU-time. If you want to dive deeper into one part of the visualization you can simply click on a frame and all frames below it will disappear and the UI will resize itself.</p>
 
-<p><img src="/assets/img/zoom.png" alt="zoom" /></p>
+<p><img src="/assets/img/flamegraphs/zoom.png" alt="zoom" /></p>
 
 <p><em>N.B. The color of each stack frame is insignificant and is completely random - differences in
 tone and intensity are provided only as a means to make the diagram easier to read.</em></p>
 
 <p>Upon immediate inspection or after clicking on a few frames to narrow down your scope - it should become immediately obvious if you have a performance problem and what is it. Remember the <a href="https://en.wikipedia.org/wiki/Pareto_principle">80/20 rule</a>, most of you performance issues will come from a small segment of your code doing way more work than it should be - don’t spend your time chasing small, thin, spikes on the flamegraph chart.</p>
 
-<p><img src="/assets/img/before.png" alt="after" /></p>
+<p><img src="/assets/img/flamegraphs/before.png" alt="after" /></p>
 
 <p>For instance, in our program we can dive into one of the larger slices and see that we are spending roughly 10% (!) of our time flushing results over a network socket in our statter! Luckily, fixing this is simple - by adding a small buffer to our code, we are able to clean up this issue and produce a new, slimmer graph.</p>
 
 <p><strong>Code Change</strong></p>
+
 <div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="p">(</span><span class="n">sc</span> <span class="o">*</span><span class="n">SimpleClient</span><span class="p">)</span> <span class="n">send</span><span class="p">(</span><span class="n">s</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
     <span class="n">sc</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="nb">append</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">bufferCapacity</span> <span class="p">{</span>
@@ -219,7 +220,7 @@ tone and intensity are provided only as a means to make the diagram easier to re
 
 <p><strong>New flamegraph</strong></p>
 
-<p><img src="/assets/img/after.png" alt="after" /></p>
+<p><img src="/assets/img/flamegraphs/after.png" alt="after" /></p>
 
 <p>That’s it! Flamegraphs are a simple and powerful tool for peeking inside your application’s performance. Try generating a flamegraph of one of your applications - you may be surprised what you with what you find :)</p>
 
@@ -239,7 +240,7 @@ tone and intensity are provided only as a means to make the diagram easier to re
 
   </article>
     <!-- Javascripts -->
-    <script src="/assets/js/script.js"></script>
+    <script src="http://localhost:4000/assets/js/script.js"></script>
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
